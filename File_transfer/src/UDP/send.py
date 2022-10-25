@@ -10,6 +10,9 @@ port = 5000
 file_path = 'C:\\Users\\shimo\\Desktop\\creeper.png'
 # package_size = int(input("Enter the package size: "))
 package_size = 1000
+# window_size = int(input("Enter window size:"))
+window_size = 4
+
 expected_number_of_packages = os.path.getsize(file_path) // package_size + 1
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -35,7 +38,6 @@ while True:
         sock.send(first_header.zfill(100))
 
 fp = open(file_path, 'rb')
-send_log = open(f"send_log_{file_name}_{package_size}.txt", 'w')
 package_number = 0
 start_time = time.time()
 last_packages = []
@@ -53,7 +55,7 @@ while True:
         if expected_packages != [x[0] for x in last_packages]: 
             last_packages = []
 
-        if len(last_packages) == 4:
+        if len(last_packages) == window_size:
             for package in last_packages:
                 sock.sendto(package[1], server_address)
             continue
@@ -72,6 +74,8 @@ while True:
 
 end_time = time.time()
 
+send_log = open(f"send_log_{file_name}_{package_size}.txt", 'w')
 send_log.write(f"File sent in {end_time - start_time} seconds")
+send_log.close()
 
 fp.close()
